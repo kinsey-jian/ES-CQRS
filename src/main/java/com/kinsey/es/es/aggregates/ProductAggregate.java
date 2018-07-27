@@ -1,7 +1,6 @@
 package com.kinsey.es.es.aggregates;
 
 import com.kinsey.es.es.commands.CreateProductCommand;
-import com.kinsey.es.common.domain.OrderId;
 import com.kinsey.es.es.event.ProductCreatedEvent;
 import com.kinsey.es.es.event.ProductNotEnoughEvent;
 import com.kinsey.es.es.event.ProductReservedEvent;

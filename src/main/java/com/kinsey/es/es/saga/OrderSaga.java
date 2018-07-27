@@ -34,34 +34,34 @@ public class OrderSaga {
 
     @StartSaga
     @SagaEventHandler(associationProperty = "orderId")
-    public void handle(OrderCreatedEvent event){
+    public void handle(OrderCreatedEvent event) {
         this.orderIdentifier = event.getOrderId();
         this.toReserve = event.getProducts();
         toRollback = new HashMap<>();
         toReserveNumber = toReserve.size();
-        event.getProducts().forEach((id,product)->{
+        event.getProducts().forEach((id, product) -> {
             ReserveProductCommand command = new ReserveProductCommand(orderIdentifier, id, product.getAmount());
             commandGateway.send(command);
         });
     }
 
     @SagaEventHandler(associationProperty = "orderId")
-    public void handle(ProductNotEnoughEvent event){
+    public void handle(ProductNotEnoughEvent event) {
         toReserveNumber--;
-        needRollback=true;
-        if(toReserveNumber==0)
+        needRollback = true;
+        if (toReserveNumber == 0)
             tryFinish();
     }
 
     private void tryFinish() {
-        if(needRollback){
-            toReserve.forEach((id, product)->{
-                if(!product.isReserved())
+        if (needRollback) {
+            toReserve.forEach((id, product) -> {
+                if (!product.isReserved())
                     return;
                 toRollback.put(id, product);
                 commandGateway.send(new RollbackReservationCommand(orderIdentifier, id, product.getAmount()));
             });
-            if(toRollback.isEmpty())
+            if (toRollback.isEmpty())
                 commandGateway.send(new RollbackOrderCommand(orderIdentifier));
             return;
         }
@@ -69,9 +69,9 @@ public class OrderSaga {
     }
 
     @SagaEventHandler(associationProperty = "orderId")
-    public void handle(ReserveCancelledEvent event){
+    public void handle(ReserveCancelledEvent event) {
         toRollback.remove(event.getProductId());
-        if(toRollback.isEmpty())
+        if (toRollback.isEmpty())
             commandGateway.send(new RollbackOrderCommand(event.getOrderId()));
     }
 
@@ -84,12 +84,12 @@ public class OrderSaga {
     }
 
     @SagaEventHandler(associationProperty = "orderId")
-    public void handle(ProductReservedEvent event){
+    public void handle(ProductReservedEvent event) {
         OrderProduct reservedProduct = toReserve.get(event.getProductId());
         reservedProduct.setReserved(true);
         toReserveNumber--;
         //Q: will a concurrent issue raise?
-        if(toReserveNumber ==0)
+        if (toReserveNumber == 0)
             tryFinish();
     }
 

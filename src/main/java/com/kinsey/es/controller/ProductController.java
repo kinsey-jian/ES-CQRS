@@ -1,17 +1,16 @@
 package com.kinsey.es.controller;
 
 import com.kinsey.es.es.commands.CreateProductCommand;
+import com.kinsey.es.model.ProductRequest;
 import com.kinsey.es.query.CustomResponseTypes;
 import com.kinsey.es.query.ProductEntry;
-import com.kinsey.es.query.ProductEntryRepository;
 import com.kinsey.es.utils.UIDGenerator;
 import lombok.AllArgsConstructor;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -26,11 +25,9 @@ public class ProductController {
     private final UIDGenerator uidGenerator;
 
     @PostMapping
-    public void create(@RequestParam(value = "name") String name,
-                       @RequestParam(value = "price") long price,
-                       @RequestParam(value = "stock") int stock) {
+    public void create(@RequestBody @Valid ProductRequest request) {
 
-        CreateProductCommand command = new CreateProductCommand(uidGenerator.getId(), name, price * 100, stock);
+        CreateProductCommand command = new CreateProductCommand(uidGenerator.getId(), request.getName(), request.getPrice(), request.getStock());
         commandGateway.sendAndWait(command);
 
     }
