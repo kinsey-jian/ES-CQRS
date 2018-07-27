@@ -52,11 +52,6 @@ public class OrderAggregate {
         products.forEach((id, product) -> payment += product.getPrice() * product.getAmount());
     }
 
-    /**
-     * Divided 100 here because of the transformation of accuracy
-     *
-     * @return
-     */
     public double getPayment() {
         return payment / 100;
     }

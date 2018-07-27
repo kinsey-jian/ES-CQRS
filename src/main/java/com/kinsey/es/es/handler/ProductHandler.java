@@ -24,6 +24,6 @@ public class ProductHandler {
     @CommandHandler
     public void on(RollbackReservationCommand command) {
         Aggregate<ProductAggregate> aggregate = repository.load(command.getProductId());
-        aggregate.execute(aggregateRoot -> aggregateRoot.cancellReserve(command.getOrderId(), command.getNumber()));
+        aggregate.execute(aggregateRoot -> aggregateRoot.cancelReserve(command.getOrderId(), command.getNumber()));
     }
 }

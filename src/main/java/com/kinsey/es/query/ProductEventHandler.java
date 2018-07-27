@@ -25,7 +25,7 @@ public class ProductEventHandler {
     public void on(ProductReservedEvent event){
         Optional<ProductEntry> product = repository.findById(String.valueOf(event.getProductId()));
         product.ifPresent(e->{
-            e.setStock(event.getAmount());
+            e.setStock(e.getStock() - event.getAmount());
             repository.save(e);
         });
     }
@@ -34,7 +34,7 @@ public class ProductEventHandler {
     public void on(ReserveCancelledEvent event){
         Optional<ProductEntry> product = repository.findById(String.valueOf(event.getProductId()));
         product.ifPresent(e->{
-            e.setStock(event.getAmount());
+            e.setStock(e.getStock() + event.getAmount());
             repository.save(e);
         });
     }

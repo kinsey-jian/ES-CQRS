@@ -49,7 +49,7 @@ public class ProductAggregate {
             apply(new ProductNotEnoughEvent(orderId, id));
     }
 
-    public void cancellReserve(Long orderId, int amount) {
+    public void cancelReserve(Long orderId, int amout) {
         apply(new ReserveCancelledEvent(orderId, id, stock));
     }
 

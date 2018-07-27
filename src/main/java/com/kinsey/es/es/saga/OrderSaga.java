@@ -6,7 +6,6 @@ import com.kinsey.es.es.commands.RollbackOrderCommand;
 import com.kinsey.es.es.commands.RollbackReservationCommand;
 import com.kinsey.es.common.domain.OrderProduct;
 import com.kinsey.es.es.event.*;
-import com.kinsey.es.common.exception.OrderCreateFailedException;
 import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.eventhandling.saga.EndSaga;
@@ -48,8 +47,7 @@ public class OrderSaga {
     public void handle(ProductNotEnoughEvent event) {
         toReserveNumber--;
         needRollback = true;
-        if (toReserveNumber == 0)
-            tryFinish();
+        if (toReserveNumber == 0) tryFinish();
     }
 
     private void tryFinish() {
@@ -76,15 +74,13 @@ public class OrderSaga {
 
     @SagaEventHandler(associationProperty = "id", keyName = "orderId")
     @EndSaga
-    public void handle(OrderCancelledEvent event) throws OrderCreateFailedException {
+    public void handle(OrderCancelledEvent event) {
         log.info("Order {} is cancelled", event.getId());
-        // throw exception here will not cause the onFailure() method in the command callback
-        //throw new OrderCreateFailedException("Not enough product to reserve!");
     }
 
     @SagaEventHandler(associationProperty = "orderId")
     public void handle(ProductReservedEvent event) {
-        OrderProduct reservedProduct = toReserve.get(event.getProductId());
+        OrderProduct reservedProduct = toReserve.get(String.valueOf(event.getProductId()));
         reservedProduct.setReserved(true);
         toReserveNumber--;
         //Q: will a concurrent issue raise?
@@ -94,9 +90,8 @@ public class OrderSaga {
 
     @SagaEventHandler(associationProperty = "id", keyName = "orderId")
     @EndSaga
-    public void handle(OrderConfirmedEvent event) throws InterruptedException {
+    public void handle(OrderConfirmedEvent event) {
         log.info("Order {} is confirmed", event.getId());
-        //Thread.sleep(10000);
     }
 
 }
