@@ -28,5 +28,6 @@ public class OrderEntry {
         this.id = id;
         this.username = username;
         this.products = products;
+        this.payment = products.values().stream().map(OrderProductEntry::getPrice).mapToDouble(Long::doubleValue).sum();
     }
 }
