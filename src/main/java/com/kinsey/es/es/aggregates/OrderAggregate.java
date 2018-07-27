@@ -1,6 +1,7 @@
 package com.kinsey.es.es.aggregates;
 
 import com.kinsey.es.common.domain.OrderProduct;
+import com.kinsey.es.enums.OrderStateEnum;
 import com.kinsey.es.es.event.OrderCancelledEvent;
 import com.kinsey.es.es.event.OrderConfirmedEvent;
 import com.kinsey.es.es.event.OrderCreatedEvent;
@@ -31,7 +32,7 @@ public class OrderAggregate {
 
     private double payment;
 
-    private String state = "processing";
+    private OrderStateEnum state = OrderStateEnum.PROCESSING;
 
     @AggregateMember
     private Map<String, OrderProduct> products;
@@ -76,12 +77,12 @@ public class OrderAggregate {
 
     @EventHandler
     public void on(OrderConfirmedEvent event) {
-        this.state = "confirmed";
+        this.state = OrderStateEnum.CONFIRMED;
     }
 
     @EventHandler
     public void on(OrderCancelledEvent event) {
-        this.state = "deleted";
+        this.state = OrderStateEnum.DELETED;
         markDeleted();
     }
 }

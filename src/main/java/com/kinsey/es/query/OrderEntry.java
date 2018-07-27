@@ -1,5 +1,6 @@
 package com.kinsey.es.query;
 
+import com.kinsey.es.enums.OrderStateEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,7 @@ public class OrderEntry {
     private String id;
     private String username;
     private double payment;
-    private String status = "reserving";
+    private OrderStateEnum status = OrderStateEnum.RESERVING;
     private Map<String, OrderProductEntry> products;
 
     public OrderEntry(String id, String username, Map<String, OrderProductEntry> products) {

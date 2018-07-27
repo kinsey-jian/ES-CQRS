@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.commandhandling.model.AggregateIdentifier;
 import org.axonframework.eventhandling.EventHandler;
+import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.spring.stereotype.Aggregate;
 
 import static org.axonframework.commandhandling.model.AggregateLifecycle.apply;
@@ -34,7 +35,7 @@ public class ProductAggregate {
         apply(new ProductCreatedEvent(command.getId(), command.getName(), command.getPrice(), command.getStock()));
     }
 
-    @EventHandler
+    @EventSourcingHandler
     public void on(ProductCreatedEvent event) {
         this.id = event.getId();
         this.name = event.getName();
@@ -50,15 +51,15 @@ public class ProductAggregate {
     }
 
     public void cancelReserve(Long orderId, int amout) {
-        apply(new ReserveCancelledEvent(orderId, id, stock));
+        apply(new ReserveCancelledEvent(orderId, id, amout));
     }
 
-    @EventHandler
+    @EventSourcingHandler
     public void on(ProductReservedEvent event) {
         stock = stock - event.getAmount();
     }
 
-    @EventHandler
+    @EventSourcingHandler
     public void on(ReserveCancelledEvent event) {
         stock += event.getAmount();
     }

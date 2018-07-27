@@ -1,12 +1,12 @@
 package com.kinsey.es.query;
 
+import com.kinsey.es.enums.OrderStateEnum;
 import com.kinsey.es.es.event.OrderCancelledEvent;
 import com.kinsey.es.es.event.OrderConfirmedEvent;
 import com.kinsey.es.es.event.OrderCreatedEvent;
 import lombok.AllArgsConstructor;
 import org.axonframework.eventhandling.EventHandler;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +35,7 @@ public class OrderEventHandler {
     public void on(OrderConfirmedEvent event) {
         Optional<OrderEntry> order = repository.findById(String.valueOf(event.getId()));
         order.ifPresent(a->{
-            a.setStatus("confirmed");
+            a.setStatus(OrderStateEnum.CONFIRMED);
             repository.save(a);
         });
     }
@@ -44,7 +44,7 @@ public class OrderEventHandler {
     public void on(OrderCancelledEvent event) {
         Optional<OrderEntry> order = repository.findById(String.valueOf(event.getId()));
         order.ifPresent(a->{
-            a.setStatus("cancelled");
+            a.setStatus(OrderStateEnum.CANCELLED);
             repository.save(a);
         });
     }

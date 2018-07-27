@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Saga
 @Slf4j
@@ -24,7 +25,7 @@ public class OrderSaga {
     private Long orderIdentifier;
     private Map<String, OrderProduct> toReserve;
     private Map<String, OrderProduct> toRollback;
-    private int toReserveNumber;
+    private AtomicInteger toReserveNumber;
     private boolean needRollback;
 
     @Autowired
@@ -36,7 +37,7 @@ public class OrderSaga {
         this.orderIdentifier = event.getOrderId();
         this.toReserve = event.getProducts();
         toRollback = new HashMap<>();
-        toReserveNumber = toReserve.size();
+        toReserveNumber = new AtomicInteger(toReserve.size());
         event.getProducts().forEach((id, product) -> {
             ReserveProductCommand command = new ReserveProductCommand(orderIdentifier, id, product.getAmount());
             commandGateway.send(command);
@@ -45,9 +46,9 @@ public class OrderSaga {
 
     @SagaEventHandler(associationProperty = "orderId")
     public void handle(ProductNotEnoughEvent event) {
-        toReserveNumber--;
+        toReserveNumber.decrementAndGet();
         needRollback = true;
-        if (toReserveNumber == 0) tryFinish();
+        if (toReserveNumber.get() == 0) tryFinish();
     }
 
     private void tryFinish() {
@@ -67,7 +68,7 @@ public class OrderSaga {
 
     @SagaEventHandler(associationProperty = "orderId")
     public void handle(ReserveCancelledEvent event) {
-        toRollback.remove(event.getProductId());
+        toRollback.remove(String.valueOf(event.getProductId()));
         if (toRollback.isEmpty())
             commandGateway.send(new RollbackOrderCommand(event.getOrderId()));
     }
@@ -82,9 +83,9 @@ public class OrderSaga {
     public void handle(ProductReservedEvent event) {
         OrderProduct reservedProduct = toReserve.get(String.valueOf(event.getProductId()));
         reservedProduct.setReserved(true);
-        toReserveNumber--;
+        toReserveNumber.decrementAndGet();
         //Q: will a concurrent issue raise?
-        if (toReserveNumber == 0)
+        if (toReserveNumber.get() == 0)
             tryFinish();
     }
 
