@@ -1,6 +1,5 @@
 package com.kinsey.es.es.event;
 
-import com.kinsey.es.common.domain.OrderId;
 import com.kinsey.es.common.domain.OrderProduct;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

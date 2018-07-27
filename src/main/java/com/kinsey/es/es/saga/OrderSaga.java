@@ -4,7 +4,6 @@ import com.kinsey.es.es.commands.ConfirmOrderCommand;
 import com.kinsey.es.es.commands.ReserveProductCommand;
 import com.kinsey.es.es.commands.RollbackOrderCommand;
 import com.kinsey.es.es.commands.RollbackReservationCommand;
-import com.kinsey.es.common.domain.OrderId;
 import com.kinsey.es.common.domain.OrderProduct;
 import com.kinsey.es.es.event.*;
 import com.kinsey.es.common.exception.OrderCreateFailedException;
