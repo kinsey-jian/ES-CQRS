@@ -34,7 +34,7 @@ public class OrderSaga {
     @StartSaga
     @SagaEventHandler(associationProperty = "id")
     public void handle(OrderCreatedEvent event) {
-        this.orderIdentifier = event.getOrderId();
+        this.orderIdentifier = event.getId();
         this.toReserve = event.getProducts();
         toRollback = new HashMap<>();
         toReserveNumber = new AtomicInteger(toReserve.size());

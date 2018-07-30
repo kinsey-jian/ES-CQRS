@@ -27,7 +27,7 @@ public class OrderEventHandler {
                         product.getName(),
                         product.getPrice(),
                         product.getAmount())));
-        OrderEntry order = new OrderEntry(event.getOrderId().toString(), event.getUsername(), map);
+        OrderEntry order = new OrderEntry(event.getId().toString(), event.getUsername(), map);
         repository.save(order);
     }
 

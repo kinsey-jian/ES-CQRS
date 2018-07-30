@@ -43,7 +43,7 @@ public class OrderAggregate {
 
     @EventHandler
     public void on(OrderCreatedEvent event) {
-        this.id = event.getOrderId();
+        this.id = event.getId();
         this.username = event.getUsername();
         this.products = event.getProducts();
         computePrice();

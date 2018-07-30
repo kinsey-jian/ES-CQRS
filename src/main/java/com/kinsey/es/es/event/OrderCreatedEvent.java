@@ -19,7 +19,7 @@ import java.util.Map;
 public class OrderCreatedEvent {
 
     @TargetAggregateIdentifier
-    private Long orderId;
+    private Long id;
 
     private String username;
 
