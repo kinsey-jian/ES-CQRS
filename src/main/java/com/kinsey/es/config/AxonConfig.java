@@ -58,8 +58,8 @@ public class AxonConfig {
     }
 
     @Bean
-    public CustomEventSourcingRepository<OrderAggregate> productAggregateRepository(CustomEmbeddedEventStore eventStore, SnapshotTriggerDefinition snapshotTriggerDefinition) {
-        return new CustomEventSourcingRepository<>(OrderAggregate.class, eventStore, snapshotTriggerDefinition);
+    public CustomEventSourcingRepository<ProductAggregate> productAggregateRepository(CustomEmbeddedEventStore eventStore, SnapshotTriggerDefinition snapshotTriggerDefinition) {
+        return new CustomEventSourcingRepository<>(ProductAggregate.class, eventStore, snapshotTriggerDefinition);
     }
 
     @Bean
