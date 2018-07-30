@@ -46,21 +46,18 @@ public class OrderSaga {
 
     @SagaEventHandler(associationProperty = "orderId")
     public void handle(ProductNotEnoughEvent event) {
-        toReserveNumber.decrementAndGet();
         needRollback = true;
-        if (toReserveNumber.get() == 0) tryFinish();
+        if (toReserveNumber.decrementAndGet() == 0) tryFinish();
     }
 
     private void tryFinish() {
         if (needRollback) {
             toReserve.forEach((id, product) -> {
-                if (!product.isReserved())
-                    return;
+                if (!product.isReserved()) return;
                 toRollback.put(id, product);
                 commandGateway.send(new RollbackReservationCommand(orderIdentifier, id, product.getAmount()));
             });
-            if (toRollback.isEmpty())
-                commandGateway.send(new RollbackOrderCommand(orderIdentifier));
+            if (toRollback.isEmpty()) commandGateway.send(new RollbackOrderCommand(orderIdentifier));
             return;
         }
         commandGateway.send(new ConfirmOrderCommand(orderIdentifier));
@@ -83,16 +80,18 @@ public class OrderSaga {
     public void handle(ProductReservedEvent event) {
         OrderProduct reservedProduct = toReserve.get(String.valueOf(event.getProductId()));
         reservedProduct.setReserved(true);
-        toReserveNumber.decrementAndGet();
-        //Q: will a concurrent issue raise?
-        if (toReserveNumber.get() == 0)
-            tryFinish();
+        if (toReserveNumber.decrementAndGet() == 0) tryFinish();
     }
 
     @SagaEventHandler(associationProperty = "id", keyName = "orderId")
     @EndSaga
     public void handle(OrderConfirmedEvent event) {
         log.info("Order {} is confirmed", event.getId());
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }
