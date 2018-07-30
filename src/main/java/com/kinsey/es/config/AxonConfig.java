@@ -38,16 +38,6 @@ public class AxonConfig {
     }
 
     @Bean
-    public CustomEventSourcingRepository<OrderAggregate> orderAggregateRepository(CustomEmbeddedEventStore eventStore) {
-        return new CustomEventSourcingRepository<>(OrderAggregate.class, eventStore);
-    }
-
-    @Bean
-    public CustomEventSourcingRepository<ProductAggregate> productAggregateRepository(CustomEmbeddedEventStore eventStore) {
-        return new CustomEventSourcingRepository<>(ProductAggregate.class, eventStore);
-    }
-
-    @Bean
     public JpaSagaStore sagaStore(Serializer serializer, EntityManagerProvider entityManagerProvider) {
         return new JpaSagaStore(serializer, entityManagerProvider);
     }
