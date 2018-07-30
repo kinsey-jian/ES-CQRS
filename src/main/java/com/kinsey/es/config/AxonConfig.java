@@ -4,6 +4,9 @@ import com.kinsey.es.es.aggregates.OrderAggregate;
 import com.kinsey.es.es.aggregates.ProductAggregate;
 import com.kinsey.es.es.jpa.CustomEmbeddedEventStore;
 import com.kinsey.es.es.jpa.CustomEventSourcingRepository;
+import com.kinsey.es.gateway.OrderCommandGateway;
+import org.axonframework.commandhandling.SimpleCommandBus;
+import org.axonframework.commandhandling.gateway.CommandGatewayFactory;
 import org.axonframework.common.jpa.EntityManagerProvider;
 import org.axonframework.config.EventHandlingConfiguration;
 import org.axonframework.eventhandling.*;
@@ -31,6 +34,11 @@ public class AxonConfig {
         return new JacksonSerializer();
     }
 
+    @Bean
+    public OrderCommandGateway getCommandGateway(SimpleCommandBus simpleCommandBus, CommandInterceptor commandInterceptor) {
+        CommandGatewayFactory factory = new CommandGatewayFactory(simpleCommandBus, new CommandRetryScheduler(), commandInterceptor);
+        return factory.createGateway(OrderCommandGateway.class);
+    }
 
     @Bean
     public CustomEmbeddedEventStore customEmbeddedEventStore(EventStorageEngine storageEngine) {

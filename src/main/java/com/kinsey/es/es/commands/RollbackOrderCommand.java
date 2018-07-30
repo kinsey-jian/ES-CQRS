@@ -5,10 +5,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RollbackOrderCommand {
-    private Long orderId;
+public class RollbackOrderCommand extends AbstractCommand{
 
     public RollbackOrderCommand(Long orderId) {
-        this.orderId = orderId;
+        super(orderId);
     }
 }

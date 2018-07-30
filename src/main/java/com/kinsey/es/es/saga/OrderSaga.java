@@ -32,7 +32,7 @@ public class OrderSaga {
     private transient CommandGateway commandGateway;
 
     @StartSaga
-    @SagaEventHandler(associationProperty = "orderId")
+    @SagaEventHandler(associationProperty = "id")
     public void handle(OrderCreatedEvent event) {
         this.orderIdentifier = event.getOrderId();
         this.toReserve = event.getProducts();
@@ -44,7 +44,7 @@ public class OrderSaga {
         });
     }
 
-    @SagaEventHandler(associationProperty = "orderId")
+    @SagaEventHandler(associationProperty = "orderId", keyName = "id")
     public void handle(ProductNotEnoughEvent event) {
         needRollback = true;
         if (toReserveNumber.decrementAndGet() == 0) tryFinish();
@@ -63,35 +63,30 @@ public class OrderSaga {
         commandGateway.send(new ConfirmOrderCommand(orderIdentifier));
     }
 
-    @SagaEventHandler(associationProperty = "orderId")
+    @SagaEventHandler(associationProperty = "orderId", keyName = "id")
     public void handle(ReserveCancelledEvent event) {
         toRollback.remove(String.valueOf(event.getProductId()));
         if (toRollback.isEmpty())
             commandGateway.send(new RollbackOrderCommand(event.getOrderId()));
     }
 
-    @SagaEventHandler(associationProperty = "id", keyName = "orderId")
+    @SagaEventHandler(associationProperty = "id")
     @EndSaga
     public void handle(OrderCancelledEvent event) {
         log.info("Order {} is cancelled", event.getId());
     }
 
-    @SagaEventHandler(associationProperty = "orderId")
+    @SagaEventHandler(associationProperty = "orderId", keyName = "id")
     public void handle(ProductReservedEvent event) {
         OrderProduct reservedProduct = toReserve.get(String.valueOf(event.getProductId()));
         reservedProduct.setReserved(true);
         if (toReserveNumber.decrementAndGet() == 0) tryFinish();
     }
 
-    @SagaEventHandler(associationProperty = "id", keyName = "orderId")
+    @SagaEventHandler(associationProperty = "id")
     @EndSaga
     public void handle(OrderConfirmedEvent event) {
         log.info("Order {} is confirmed", event.getId());
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
 }

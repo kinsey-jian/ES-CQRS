@@ -37,12 +37,12 @@ public class OrderHandler {
                             aggregate.invoke(ProductAggregate::getPrice),
                             number));
         });
-        repository.newInstance(() -> new OrderAggregate(command.getOrderId(), command.getUsername(), products));
+        repository.newInstance(() -> new OrderAggregate(command.getId(), command.getUsername(), products));
     }
 
     @CommandHandler
     public void handle(RollbackOrderCommand command) {
-        Aggregate<OrderAggregate> aggregate = repository.load(String.valueOf(command.getOrderId()));
+        Aggregate<OrderAggregate> aggregate = repository.load(String.valueOf(command.getId()));
         aggregate.execute(OrderAggregate::delete);
     }
 
